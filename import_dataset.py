@@ -1,9 +1,8 @@
-from collections import defaultdict
-from typing import Dict, List
+from models import DirectedGraph, UndirectedGraph
 
 
-def google_oriented(filename: str) -> Dict[int, List[int]]:
-    graph = defaultdict(list)
+def google_directed(filename: str, num_of_nodes: int) -> DirectedGraph:
+    graph = DirectedGraph(num_of_nodes)
 
     with open(filename, 'r') as file:
         for l in file.readlines():
@@ -11,12 +10,12 @@ def google_oriented(filename: str) -> Dict[int, List[int]]:
                 continue
             new_line = l.strip()
             u, v = new_line.split('\t')
-            graph[int(u)].append(int(v))
+            graph.add_edge(int(u), int(v))
     return graph
 
 
-def ca_not_oriented(filename: str) -> Dict[int, List[int]]:
-    graph = defaultdict(list)
+def ca_undirected(filename: str, num_of_nodes: int) -> UndirectedGraph:
+    graph = UndirectedGraph(num_of_nodes)
 
     with open(filename, 'r') as file:
         for l in file.readlines():
@@ -24,8 +23,5 @@ def ca_not_oriented(filename: str) -> Dict[int, List[int]]:
                 continue
             new_line = l.strip()
             u, v = new_line.split('\t')
-            if int(v) not in graph[int(u)]:
-                graph[int(u)].append(int(v))
-            if int(u) not in graph[int(v)]:
-                graph[int(v)].append(int(u))
+            graph.add_edge(int(u), int(v))
     return graph
