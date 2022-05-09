@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Union, Set
+from typing import List, Union, Set, Tuple
 from collections import defaultdict
 
 
@@ -8,10 +8,16 @@ class Edge:
     start: int
     end: int
 
+    def to_tuple(self) -> Tuple[str, str]:
+        return str(self.start), str(self.end)
+
 
 @dataclass
 class WeightedEdge(Edge):
     weight: int
+
+    def to_tuple(self) -> Tuple[str, str, float]:
+        return str(self.start), str(self.end), float(self.weight)
 
 
 class BaseGraph:
