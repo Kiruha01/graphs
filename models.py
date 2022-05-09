@@ -65,5 +65,5 @@ class WeightedDirectedGraph(BaseGraph):
 class UndirectedWeightedGraph(BaseGraph):
     def add_edge(self, _from: int, _to: int, _weight: int) -> None:
         self.outgoing_adj_list.setdefault(_from, list()).append(WeightedEdge(_from, _to, _weight))
-        self.outgoing_adj_list.setdefault(_to, list()).append(WeightedEdge(_from, _to, _weight))
+        self.outgoing_adj_list.setdefault(_to, list()).append(WeightedEdge(_to, _from, _weight))
         self.num_edges += 2

@@ -1,4 +1,4 @@
-from models import DirectedGraph, UndirectedGraph, WeightedDirectedGraph
+from models import DirectedGraph, UndirectedGraph, UndirectedWeightedGraph
 import csv
 
 
@@ -29,7 +29,7 @@ def ca_undirected(filename: str) -> UndirectedGraph:
 
 
 def vk_directed(filename: str):
-    graph = WeightedDirectedGraph()
+    graph = UndirectedWeightedGraph()
 
     with open(filename, newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
@@ -38,8 +38,6 @@ def vk_directed(filename: str):
             u, v, t, h = "".join(row).split(",")
             if t != '0':
                 graph.add_edge(int(u), int(v), int(t))
-            if h != '0':
-                graph.add_edge(int(v), int(u), int(h))
 
     return graph
 
