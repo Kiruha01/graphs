@@ -5,6 +5,7 @@ from collections import defaultdict
 
 @dataclass
 class Edge:
+    __slots__ = ["start", "end"]
     start: int
     end: int
 
@@ -15,12 +16,15 @@ class Edge:
 @dataclass
 class WeightedEdge(Edge):
     weight: int
+    __slots__ = ["start", "end", "weight"]
 
     def to_tuple(self) -> Tuple[str, str, float]:
         return str(self.start), str(self.end), float(self.weight)
 
 
 class BaseGraph:
+    __slots__ = ["num_edges", "outgoing_adj_list", "incoming_adj_list"]
+
     def __init__(self):
         self.num_edges = 0
         self.outgoing_adj_list = defaultdict(list)
