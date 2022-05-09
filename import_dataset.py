@@ -2,8 +2,8 @@ from models import DirectedGraph, UndirectedGraph, WeightedDirectedGraph
 import csv
 
 
-def google_directed(filename: str, num_of_nodes: int) -> DirectedGraph:
-    graph = DirectedGraph(num_of_nodes)
+def google_directed(filename: str) -> DirectedGraph:
+    graph = DirectedGraph()
 
     with open(filename, 'r') as file:
         for l in file.readlines():
@@ -15,8 +15,8 @@ def google_directed(filename: str, num_of_nodes: int) -> DirectedGraph:
     return graph
 
 
-def ca_undirected(filename: str, num_of_nodes: int) -> UndirectedGraph:
-    graph = UndirectedGraph(num_of_nodes)
+def ca_undirected(filename: str) -> UndirectedGraph:
+    graph = UndirectedGraph()
 
     with open(filename, 'r') as file:
         for l in file.readlines():
@@ -28,8 +28,8 @@ def ca_undirected(filename: str, num_of_nodes: int) -> UndirectedGraph:
     return graph
 
 
-def vk_directed(filename: str, num_of_nodes: int):
-    graph = WeightedDirectedGraph(num_of_nodes)
+def vk_directed(filename: str):
+    graph = WeightedDirectedGraph()
 
     with open(filename, newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
