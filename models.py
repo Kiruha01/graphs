@@ -41,6 +41,13 @@ class BaseGraph:
     def get_all_vertices(self) -> Set[int]:
         return set(self.outgoing_adj_list.keys()).union(set(self.incoming_adj_list.keys()))
 
+    def is_weighted(self):
+        raise NotImplementedError()
+
+    @property
+    def num_vertices(self):
+        return len(self.get_all_vertices())
+
 
 class DirectedGraph(BaseGraph):
     def add_edge(self, _from: int, _to: int) -> None:
@@ -49,12 +56,18 @@ class DirectedGraph(BaseGraph):
         self.incoming_adj_list[_to].append(edge)
         self.num_edges += 1
 
+    def is_weighted(self):
+        return False
+
 
 class UndirectedGraph(BaseGraph):
     def add_edge(self, _from: int, _to: int) -> None:
         self.outgoing_adj_list[_from].append(Edge(_from, _to))
         self.outgoing_adj_list[_to].append(Edge(_to, _from))
         self.num_edges += 2
+
+    def is_weighted(self):
+        return False
 
 
 class WeightedDirectedGraph(BaseGraph):
@@ -65,9 +78,15 @@ class WeightedDirectedGraph(BaseGraph):
 
         self.num_edges += 1
 
+    def is_weighted(self):
+        return True
+
 
 class UndirectedWeightedGraph(BaseGraph):
     def add_edge(self, _from: int, _to: int, _weight: int) -> None:
         self.outgoing_adj_list.setdefault(_from, list()).append(WeightedEdge(_from, _to, _weight))
         self.outgoing_adj_list.setdefault(_to, list()).append(WeightedEdge(_to, _from, _weight))
         self.num_edges += 2
+
+    def is_weighted(self):
+        return True
