@@ -86,9 +86,10 @@ def _get_shortest_path_lengths(graph: BaseGraph, source: int, vertices: Optional
     unvisited = copy.deepcopy(all_vertices)
     while unvisited:
         min_v = min(unvisited, key=lambda item: lengths[item])
-        for edge in graph.get_all_edges_of(min_v):
-            weight = edge.weight if graph.is_weighted() else 1
-            lengths[edge.end] = min(lengths[edge.end], weight + lengths[min_v])
+        for edge in graph.outgoing_adj_list[min_v]:
+            lengths[edge.end] = min(lengths[edge.end], lengths[min_v] + 1)
+        for edge in graph.incoming_adj_list[min_v]:
+            lengths[edge.start] = min(lengths[edge.start], lengths[min_v] + 1)
         unvisited.discard(min_v)
 
     if vertices is None:
