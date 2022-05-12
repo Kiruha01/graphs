@@ -119,10 +119,13 @@ def evaluate_main_characteristics(graph: BaseGraph, max_weak_comp: List[int], k:
     return radius, diameter, percentile
 
 
-def evaluate_vertices_degree(graph: BaseGraph) -> Dict[int, int]:
-    degree = defaultdict(int)
+def evaluate_vertices_degree(graph: BaseGraph) -> Dict[int, list]:
+    """
+    Подсчёт вершин с определённой степенью
+    """
+    degree = defaultdict(list)
     for v in graph.get_all_vertices():
-        degree[len(tuple(graph.neighbors(v)))] += 1
+        degree[len(tuple(graph.neighbors(v)))].append(v)
     return degree
 
 
