@@ -136,10 +136,10 @@ def num_of_triangles(graph: BaseGraph) -> int:
     marked_a = set()
     triangles = 0
     for a in graph.get_all_vertices():
-        marked_b = set()
+        marked_b = marked_a.copy()
+        marked_b.add(a)
         for b in filter(lambda x: x not in marked_a, graph.neighbors(a)):
-            for c in filter(lambda x: x not in marked_a | marked_b | {a},
-                            graph.neighbors(b)):
+            for c in filter(lambda x: x not in marked_b, graph.neighbors(b)):
                 if a in graph.neighbors(c):
                     triangles += 1
             marked_b.add(b)
@@ -167,7 +167,7 @@ def _local_cluster_coefficient(graph: BaseGraph, v: int) -> float:
     """
     Вычисление локального кластерного коэффициента графа на вершине v
     """
-    degree = len(tuple(graph.neighbors(v)))
+    degree = len(set(graph.neighbors(v)))
     if degree < 2:
         return 0
 
