@@ -1,5 +1,5 @@
 # Проект по графам
-[Google Colab](https://colab.research.google.com/github/Kiruha01/graphs/blob/master/Untitled.ipynb)
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Kiruha01/graphs/blob/master/Untitled.ipynb)
 
 ## Загрузка датасета
 1. Загрузить папку с датасетом на Google Drive
