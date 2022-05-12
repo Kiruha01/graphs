@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Union, Set, Tuple
+from typing import List, Union, Set, Tuple, Iterable
 from collections import defaultdict
 
 
@@ -12,6 +12,16 @@ class Edge:
     def to_tuple(self) -> Tuple[str, str]:
         return str(self.start), str(self.end)
 
+    def __hash__(self):
+        if self.start > self.end:
+            return hash(f"{self.start} {self.end}")
+        else:
+            return hash(f"{self.end} {self.start}")
+
+    def __eq__(self, other):
+        return self.start == other.start and self.end == other.end \
+            or self.end == other.start and self.start == other.end
+
 
 @dataclass
 class WeightedEdge(Edge):
@@ -20,6 +30,17 @@ class WeightedEdge(Edge):
 
     def to_tuple(self) -> Tuple[str, str, float]:
         return str(self.start), str(self.end), float(self.weight)
+
+    def __hash__(self):
+        if self.start > self.end:
+            return hash(f"{self.start} {self.end}")
+        else:
+            return hash(f"{self.end} {self.start}")
+
+    def __eq__(self, other):
+        return self.start == other.start and self.end == other.end \
+            or self.end == other.start and self.start == other.end
+
 
 
 class BaseGraph:
@@ -68,9 +89,18 @@ class BaseGraph:
 
         print(end_vertices, start_vertices)
 
+    def neighbors(self, v: int) -> Iterable[int]:
+        for e in self.outgoing_adj_list[v]:
+            yield e.end
+        for e in self.incoming_adj_list[v]:
+            yield e.start
+
     @property
     def num_vertices(self):
         return len(self.get_all_vertices())
+
+    def __getitem__(self, key):
+        return set(self.outgoing_adj_list[key]).update(self.incoming_adj_list[key])
 
 
 class DirectedGraph(BaseGraph):
