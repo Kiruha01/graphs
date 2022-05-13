@@ -1,10 +1,10 @@
 import copy
 import math
 import random
-from typing import List, Tuple, Optional, Dict
+from typing import List, Tuple, Optional, Dict, Union, Callable, Any
 from collections import deque, defaultdict
 
-from models import BaseGraph
+from models import BaseGraph, UndirectedGraph, UndirectedWeightedGraph
 
 
 def weak_conns(graph: BaseGraph) -> List[List[int]]:
@@ -193,3 +193,55 @@ def average_and_global_cluster_coefficients(graph: BaseGraph) -> Tuple[float, fl
     average = sum_for_avg/len(vertices)
     glob = sum_for_global/sum_of_comb
     return average, glob
+
+
+def split_graph(
+    graph: Union[UndirectedGraph, UndirectedWeightedGraph],
+    weak_conns: List[List[int]],
+) -> List[Union[UndirectedGraph, UndirectedWeightedGraph]]:
+    """
+    Разделить граф по компонентам слабой связности
+
+    :param graph:
+    :param weak_conns:
+    """
+    graphs = []
+
+    for component in weak_conns:
+        new_graph = UndirectedGraph() if isinstance(graph, UndirectedGraph) else UndirectedWeightedGraph()
+        for vertex in component:
+            new_graph.outgoing_adj_list[vertex] = graph.outgoing_adj_list[vertex]
+        graphs.append(new_graph)
+
+    return graphs
+
+
+def run_on_graphs(
+        func: Callable[[BaseGraph, ...], Any],
+        graphs: List[Union[UndirectedGraph, UndirectedWeightedGraph]],
+        adder: Callable[[Any, Any], Any],
+        *args,
+        **kwargs,
+) -> Any:
+    """
+    Запуск функции на множестве графов с последующим суммированием результата
+
+    :param func: Целевая функция, результат которой необходимо узнать
+    :param graphs: Множество графов, полученное функцией split_graph
+    :param adder: Функция суммирования результата. Должна иметь сигнатуру
+
+    def adder(result: Any, value: Any=None) -> Any:
+        ...
+    """
+    result = None
+    for index, graph in enumerate(graphs):
+        print(f">{index+1} graph...", end=' ')
+        val = func(graph, *args, **kwargs)
+        if result is not None:
+            result = adder(result, val)
+        else:
+            result = val
+        print(f"Pre-result: {result}")
+    return result
+
+
