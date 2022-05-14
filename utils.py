@@ -77,27 +77,22 @@ def strong_conns(graph: BaseGraph) -> List[List[int]]:
     return comps
 
 
-def _get_shortest_path_lengths(graph: BaseGraph, source: int, vertices: Optional[List[int]] = None) -> Dict[int, int]:
-    """Кротчайшее расстояние от v до вершин vertices (все если None) алгоритмом Дейкстры"""
+def _get_shortest_path_lengths(graph: BaseGraph, source: int, vertices: Optional[List[int]]) -> Dict[int, int]:
+    """Кротчайшее расстояние от v до вершин vertices поиском в ширину"""
 
-    all_vertices = graph.get_all_vertices()
+    unvisited_target_vertices = set(vertices)
+    unvisited_target_vertices.discard(source)
+    lengths = {source: 0}
+    queue = deque([(source, 0)])
+    while unvisited_target_vertices:
+        v, length = queue.popleft()
+        for n in graph.neighbors(v):
+            if n not in lengths:
+                queue.append((n, length + 1))
+                lengths[n] = length + 1
+                unvisited_target_vertices.discard(n)
 
-    lengths = {v: float('inf') for v in all_vertices}
-    lengths[source] = 0
-
-    unvisited = copy.deepcopy(all_vertices)
-    while unvisited:
-        min_v = min(unvisited, key=lambda item: lengths[item])
-        for edge in graph.outgoing_adj_list[min_v]:
-            lengths[edge.end] = min(lengths[edge.end], lengths[min_v] + 1)
-        for edge in graph.incoming_adj_list[min_v]:
-            lengths[edge.start] = min(lengths[edge.start], lengths[min_v] + 1)
-        unvisited.discard(min_v)
-
-    if vertices is None:
-        return lengths
-    else:
-        return {v: lengths[v] for v in vertices}
+    return {v: lengths[v] for v in vertices}
 
 
 def evaluate_main_characteristics(graph: BaseGraph, max_weak_comp: List[int], k: int = 500) -> Tuple[int, int, int]:
