@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Union, Set, Tuple, Iterable
+from typing import List, Union, Set, Tuple, Iterable, Dict
 from collections import defaultdict
 
 
@@ -94,6 +94,15 @@ class BaseGraph:
             yield e.end
         for e in self.incoming_adj_list[v]:
             yield e.start
+
+    def out_vertices_by_priority(self, v: int, priority: Dict[int, int] = None):
+        new_edges = sorted(filter(lambda x: priority.get(x.end), self.outgoing_adj_list[v].copy()), key=lambda x: priority[x.end], reverse=True)
+        for i in new_edges:
+            if priority.get(i.end):
+                yield i.end
+
+    def __repr__(self):
+        return f"<Graph Outgoing: {self.outgoing_adj_list}; Incoming: {self.incoming_adj_list}"
 
     @property
     def num_vertices(self):

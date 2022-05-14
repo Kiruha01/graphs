@@ -2,7 +2,7 @@ import copy
 import math
 import random
 from typing import List, Tuple, Optional, Dict, Union, Callable, Any
-from collections import deque, defaultdict
+from collections import deque, defaultdict, OrderedDict
 
 from models import BaseGraph, UndirectedGraph, UndirectedWeightedGraph
 
@@ -38,8 +38,9 @@ def weak_conns(graph: BaseGraph) -> List[List[int]]:
 def strong_conns(graph: BaseGraph) -> List[List[int]]:
     """Поиск компонент сильной связности"""
 
-    ver_order = []
     unvisited = copy.deepcopy(graph.get_all_vertices())
+    time = len(unvisited)
+    ver_priority = OrderedDict()
     while unvisited:
         # DFS on inverted graph
         start = unvisited.pop()
@@ -53,23 +54,23 @@ def strong_conns(graph: BaseGraph) -> List[List[int]]:
                     break
             else:
                 stack.pop()
-                ver_order.append(v)
-    ver_order.reverse()
+                ver_priority[v] = time
+                time -= 1
 
     # DFS on normal graph with new order
-    unvisited = set(graph.get_all_vertices())
     comps = []
-    while unvisited:
-        start = sorted(unvisited, key=lambda x: ver_order.index(x))[0]
-        stack = deque([start])
+    while ver_priority:
+        start = ver_priority.popitem(last=False)[0]
+        stack = deque([[start, graph.out_vertices_by_priority(start, ver_priority)]])
         comps.append([])
         while stack:
-            v = stack[-1]
-            unvisited.discard(v)
-            for out_edge in sorted(graph.outgoing_adj_list[v], key=lambda edge: ver_order.index(edge.end)):
-                if out_edge.end in unvisited:
-                    stack.append(out_edge.end)
-                    break
+            v, next_vertex_gen = stack[-1]
+            if ver_priority.get(v):
+                ver_priority.pop(v)
+
+            for out in next_vertex_gen:
+                stack.append([out, graph.out_vertices_by_priority(out, ver_priority)])
+                break
             else:
                 stack.pop()
                 comps[-1].append(v)
@@ -217,7 +218,7 @@ def split_graph(
 
 
 def run_on_graphs(
-        func: Callable[[BaseGraph, ...], Any],
+        func: Callable[[BaseGraph, Any], Any],
         graphs: List[Union[UndirectedGraph, UndirectedWeightedGraph]],
         adder: Callable[[Any, Any], Any],
         *args,
@@ -235,7 +236,7 @@ def run_on_graphs(
     """
     result = None
     for index, graph in enumerate(graphs):
-        print(f">{index+1} graph...", end=' ')
+        print(f">graph {index+1} of {len(graphs)}, size {graph.num_vertices}...", end=' ')
         val = func(graph, *args, **kwargs)
         if result is not None:
             result = adder(result, val)
