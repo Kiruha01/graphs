@@ -86,7 +86,7 @@ def _get_shortest_path_lengths(graph: BaseGraph, source: int, vertices: Optional
     queue = deque([(source, 0)])
     while unvisited_target_vertices:
         v, length = queue.popleft()
-        for n in graph.neighbors(v):
+        for n in graph.neighbors[v]:
             if n not in lengths:
                 queue.append((n, length + 1))
                 lengths[n] = length + 1
@@ -121,7 +121,7 @@ def evaluate_vertices_degree(graph: BaseGraph) -> Dict[int, list]:
     """
     degree = defaultdict(list)
     for v in graph.get_all_vertices():
-        degree[len(tuple(graph.neighbors(v)))].append(v)
+        degree[len(graph.neighbors[v])].append(v)
     return degree
 
 
@@ -132,12 +132,13 @@ def num_of_triangles(graph: BaseGraph) -> int:
     marked_a = set()
     triangles = 0
     for a in graph.get_all_vertices():
-        marked_b = marked_a.copy()
+        marked_b = set()
         marked_b.add(a)
-        for b in filter(lambda x: x not in marked_a, graph.neighbors(a)):
-            for c in filter(lambda x: x not in marked_b, graph.neighbors(b)):
-                if a in graph.neighbors(c):
-                    triangles += 1
+        for b in graph.neighbors[a]:
+            if b not in marked_a:
+                for c in graph.neighbors[b]:
+                    if c not in marked_b and c not in marked_a and a in graph.neighbors[c]:
+                        triangles += 1
             marked_b.add(b)
         marked_a.add(a)
     return triangles
@@ -148,7 +149,7 @@ def _edges_between_n(graph: BaseGraph, v: int) -> int:
     Подсчёт количества рёбер между соседями вершины v
     """
     edges = set()
-    neigh = set(graph.neighbors(v))
+    neigh = graph.neighbors[v]
     for n in neigh:
         for n_edge in graph.outgoing_adj_list[n]:
             if n_edge.end in neigh:
@@ -163,7 +164,7 @@ def _local_cluster_coefficient(graph: BaseGraph, v: int) -> float:
     """
     Вычисление локального кластерного коэффициента графа на вершине v
     """
-    degree = len(set(graph.neighbors(v)))
+    degree = len(graph.neighbors[v])
     if degree < 2:
         return 0
 
@@ -179,7 +180,7 @@ def average_and_global_cluster_coefficients(graph: BaseGraph) -> Tuple[float, fl
     vertices = graph.get_all_vertices()
     for v in vertices:
         local_coef = _local_cluster_coefficient(graph, v)
-        n = len(tuple(graph.neighbors(v)))
+        n = len(graph.neighbors[v])
         comb = math.comb(n, 2)
 
         sum_for_avg += local_coef

@@ -42,14 +42,12 @@ class WeightedEdge(Edge):
             or self.end == other.start and self.start == other.end
 
 
-
 class BaseGraph:
-    __slots__ = ["num_edges", "outgoing_adj_list", "incoming_adj_list"]
-
     def __init__(self):
         self.num_edges = 0
         self.outgoing_adj_list = defaultdict(list)
         self.incoming_adj_list = defaultdict(list)
+        self.neighbors = defaultdict(set)
 
     def get_all_edges_of(self, v: int) -> List[Union[Edge, WeightedEdge]]:
         """Get all edges connected v"""
@@ -89,12 +87,6 @@ class BaseGraph:
 
         print(end_vertices, start_vertices)
 
-    def neighbors(self, v: int) -> Iterable[int]:
-        for e in self.outgoing_adj_list[v]:
-            yield e.end
-        for e in self.incoming_adj_list[v]:
-            yield e.start
-
     def out_vertices_by_priority(self, v: int, priority: Dict[int, int] = None):
         new_edges = sorted(filter(lambda x: priority.get(x.end), self.outgoing_adj_list[v].copy()), key=lambda x: priority[x.end], reverse=True)
         for i in new_edges:
@@ -119,6 +111,9 @@ class DirectedGraph(BaseGraph):
         self.incoming_adj_list[_to].append(edge)
         self.num_edges += 1
 
+        self.neighbors[_from].add(_to)
+        self.neighbors[_to].add(_from)
+
     def is_weighted(self):
         return False
 
@@ -128,6 +123,9 @@ class UndirectedGraph(BaseGraph):
         self.outgoing_adj_list[_from].append(Edge(_from, _to))
         self.outgoing_adj_list[_to].append(Edge(_to, _from))
         self.num_edges += 2
+
+        self.neighbors[_from].add(_to)
+        self.neighbors[_to].add(_from)
 
     def is_weighted(self):
         return False
@@ -141,6 +139,9 @@ class WeightedDirectedGraph(BaseGraph):
 
         self.num_edges += 1
 
+        self.neighbors[_from].add(_to)
+        self.neighbors[_to].add(_from)
+
     def is_weighted(self):
         return True
 
@@ -150,6 +151,9 @@ class UndirectedWeightedGraph(BaseGraph):
         self.outgoing_adj_list.setdefault(_from, list()).append(WeightedEdge(_from, _to, _weight))
         self.outgoing_adj_list.setdefault(_to, list()).append(WeightedEdge(_to, _from, _weight))
         self.num_edges += 2
+
+        self.neighbors[_from].add(_to)
+        self.neighbors[_to].add(_from)
 
     def is_weighted(self):
         return True
