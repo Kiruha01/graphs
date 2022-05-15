@@ -42,7 +42,7 @@ print("Слабая связность", comps)
 max_comp = max(comps, key=len)
 print("Доля вершин:", len(max_comp) / total_v)
 
-radius, diameter, percentile = evaluate_main_characteristics(ca_graph, [3, 5, 2, 1])
+radius, diameter, percentile = evaluate_main_characteristics(ca_graph, max_comp)
 print("Радиус: ", radius)
 print("Диаметр: ", diameter)
 print("90 процентиль расстояния: ", percentile)
