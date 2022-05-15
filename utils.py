@@ -1,7 +1,7 @@
 import copy
 import math
 import random
-from typing import List, Tuple, Optional, Dict, Union, Callable, Any
+from typing import List, Tuple, Dict, Union, Callable, Any
 from collections import deque, defaultdict, OrderedDict
 
 from models import BaseGraph, UndirectedGraph, UndirectedWeightedGraph
@@ -77,7 +77,7 @@ def strong_conns(graph: BaseGraph) -> List[List[int]]:
     return comps
 
 
-def _get_shortest_path_lengths(graph: BaseGraph, source: int, vertices: Optional[List[int]]) -> Dict[int, int]:
+def _get_shortest_path_lengths(graph: BaseGraph, source: int, vertices: List[int]) -> Dict[int, int]:
     """Кротчайшее расстояние от v до вершин vertices поиском в ширину"""
 
     unvisited_target_vertices = set(vertices)
