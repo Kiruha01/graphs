@@ -7,7 +7,7 @@ from collections import deque, defaultdict, OrderedDict
 from models import BaseGraph, UndirectedGraph, UndirectedWeightedGraph
 
 
-def weak_conns(graph: BaseGraph) -> List[List[int]]:
+def weak_conns(graph: BaseGraph) -> List[Set[int]]:
     """Поиск компонент слабой связности"""
 
     unvisited = copy.deepcopy(graph.get_all_vertices())
@@ -15,7 +15,7 @@ def weak_conns(graph: BaseGraph) -> List[List[int]]:
 
     while unvisited:
         start = unvisited.pop()
-        comps.append([])
+        comps.append(set())
         stack = deque([start])
         while stack:
             v = stack[-1]
@@ -31,7 +31,7 @@ def weak_conns(graph: BaseGraph) -> List[List[int]]:
                         break
                 else:
                     stack.pop()
-                    comps[-1].append(v)
+                    comps[-1].add(v)
     return comps
 
 
@@ -60,7 +60,7 @@ def strong_conns(graph: BaseGraph) -> List[Set[int]]:
     # DFS on normal graph with new order
     comps = []
     while ver_priority:
-        start = ver_priority.popitem(last=False)[0]
+        start = ver_priority.popitem()[0]
         stack = deque([[start, graph.out_vertices_by_priority(start, ver_priority)]])
         comps.append(set())
         while stack:
@@ -244,12 +244,13 @@ def run_on_graphs(
 
 def get_proportions_after_vertices_removal(
         graph: BaseGraph, step: float = 1.0, del_only_max_degree: bool = False
-) -> List[Tuple[float, float]]:
+) -> Tuple[List[float], List[float]]:
     assert 0 < step < 100
 
     graph_copy = copy.deepcopy(graph)
 
-    result = []
+    result_x = []
+    result_y = []
     x = 0.0
     while x < 100:
         all_vertices = list(graph_copy.get_all_vertices())
@@ -267,10 +268,12 @@ def get_proportions_after_vertices_removal(
         # add proportion
         comps = weak_conns(graph_copy)
         max_weak_comp = max(comps, key=len)
-        result.append((x, len(max_weak_comp) / graph_copy.num_vertices))
+        result_x.append(x)
+        result_y.append(len(max_weak_comp) / graph_copy.num_vertices)
 
         x += step
 
-    result.append((100.0, 0.0))
+    result_x.append(100.0)
+    result_y.append(0.0)
 
-    return result
+    return result_x, result_y

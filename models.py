@@ -67,14 +67,18 @@ class BaseGraph:
     def is_weighted(self):
         raise NotImplementedError()
 
+    def is_directed(self):
+        raise NotImplementedError()
+
     def delete_vertex(self, v: int) -> None:
+        if not self.is_directed():
+            del self.outgoing_adj_list[v]
+            return
+
         end_vertices = []
         while self.outgoing_adj_list[v]:
             end_vertices.append(self.outgoing_adj_list[v][0].end)
             self.outgoing_adj_list[v].pop(0)
-
-        if not self.incoming_adj_list:
-            return
 
         for end in end_vertices:
             idx = [idx for idx, x in enumerate(self.incoming_adj_list[end]) if x.start == v][0]
@@ -126,8 +130,11 @@ class DirectedGraph(BaseGraph):
         self.neighbors[_from].add(_to)
         self.neighbors[_to].add(_from)
 
-    def is_weighted(self):
+    def is_weighted(self) -> bool:
         return False
+
+    def is_directed(self) -> bool:
+        return True
 
 
 class UndirectedGraph(BaseGraph):
@@ -139,7 +146,10 @@ class UndirectedGraph(BaseGraph):
         self.neighbors[_from].add(_to)
         self.neighbors[_to].add(_from)
 
-    def is_weighted(self):
+    def is_weighted(self) -> bool:
+        return False
+
+    def is_directed(self) -> bool:
         return False
 
 
@@ -154,7 +164,10 @@ class WeightedDirectedGraph(BaseGraph):
         self.neighbors[_from].add(_to)
         self.neighbors[_to].add(_from)
 
-    def is_weighted(self):
+    def is_weighted(self) -> bool:
+        return True
+
+    def is_directed(self) -> bool:
         return True
 
 
@@ -167,5 +180,8 @@ class UndirectedWeightedGraph(BaseGraph):
         self.neighbors[_from].add(_to)
         self.neighbors[_to].add(_from)
 
-    def is_weighted(self):
+    def is_weighted(self) -> bool:
         return True
+
+    def is_directed(self) -> bool:
+        return False
