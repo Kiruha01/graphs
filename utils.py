@@ -265,18 +265,16 @@ def get_proportions_after_vertices_removal(
     result = []
     x = 0.0
     while x < 100:
-        # find vertices from which we need to delete
-        all_vertices = graph_copy.get_all_vertices()
-        if del_only_max_degree:
-            max_degree = max(len(graph_copy.neighbors[v]) for v in all_vertices)
-            vertices = list(filter(lambda v: len(graph_copy.neighbors[v]) == max_degree, all_vertices))
-        else:
-            vertices = all_vertices
+        all_vertices = list(graph_copy.get_all_vertices())
 
         # delete needed number of vertices
         percent_to_delete = 0.0 if x == 0.0 else 1 - (1 - x / 100) / (1 - (x - step) / 100)
-        vertices_num_to_delete = int(len(vertices) * percent_to_delete)
-        vertices_to_delete = random.choices(list(graph_copy.get_all_vertices()), k=vertices_num_to_delete)
+        vertices_num_to_delete = int(len(all_vertices) * percent_to_delete)
+        if del_only_max_degree:
+            sorted_all_vertices = sorted(all_vertices, key=lambda v: len(graph_copy.neighbors[v]), reverse=True)
+            vertices_to_delete = sorted_all_vertices[:vertices_num_to_delete]
+        else:
+            vertices_to_delete = random.choices(all_vertices, k=vertices_num_to_delete)
         graph_copy.delete_vertices(vertices_to_delete)
 
         # add proportion
