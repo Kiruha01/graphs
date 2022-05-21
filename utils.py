@@ -1,6 +1,7 @@
 import copy
 import math
 import random
+import typing
 from typing import List, Tuple, Dict, Union, Callable, Any
 from collections import deque, defaultdict, OrderedDict
 
@@ -242,3 +243,49 @@ def run_on_graphs(
     return result
 
 
+def _get_vertices_to_delete(graph: BaseGraph, percent: float, del_only_max_degree: bool) -> List[int]:
+    if del_only_max_degree:
+        all_vertices = list(graph.get_all_vertices())
+        max_degree = max(len(graph.neighbors[v]) for v in all_vertices)
+        vertices = list(filter(lambda v: len(graph.neighbors[v]) == max_degree, all_vertices))
+    else:
+        vertices = list(graph.get_all_vertices())
+
+    vertices_num_to_delete = int(len(vertices) * percent / 100)
+    return random.choices(vertices, k=vertices_num_to_delete) if len(vertices) > vertices_num_to_delete else vertices
+
+
+def get_proportions_after_vertices_removal(
+        graph: BaseGraph, step: float = 1.0, del_only_max_degree: bool = False
+) -> List[Tuple[float, float]]:
+    assert 0 < step < 100
+
+    graph_copy = copy.deepcopy(graph)
+
+    result = []
+    x = 0.0
+    while x < 100:
+        # find vertices from which we need to delete
+        all_vertices = graph_copy.get_all_vertices()
+        if del_only_max_degree:
+            max_degree = max(len(graph_copy.neighbors[v]) for v in all_vertices)
+            vertices = list(filter(lambda v: len(graph_copy.neighbors[v]) == max_degree, all_vertices))
+        else:
+            vertices = all_vertices
+
+        # delete needed number of vertices
+        percent_to_delete = 0.0 if x == 0.0 else 1 - (1 - x / 100) / (1 - (x - step) / 100)
+        vertices_num_to_delete = int(len(vertices) * percent_to_delete)
+        vertices_to_delete = random.choices(list(graph_copy.get_all_vertices()), k=vertices_num_to_delete)
+        graph_copy.delete_vertices(vertices_to_delete)
+
+        # add proportion
+        comps = weak_conns(graph_copy)
+        max_weak_comp = max(comps, key=len)
+        result.append((x, len(max_weak_comp) / graph_copy.num_vertices))
+
+        x += step
+
+    result.append((100.0, 0.0))
+
+    return result

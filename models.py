@@ -1,3 +1,5 @@
+import copy
+import random
 from dataclasses import dataclass
 from typing import List, Union, Set, Tuple, Iterable, Dict
 from collections import defaultdict
@@ -43,6 +45,8 @@ class WeightedEdge(Edge):
 
 
 class BaseGraph:
+    __slots__ = ('num_edges', 'outgoing_adj_list', 'incoming_adj_list', 'neighbors')
+
     def __init__(self):
         self.num_edges = 0
         self.outgoing_adj_list = defaultdict(list)
@@ -85,7 +89,9 @@ class BaseGraph:
             idx = [idx for idx, x in enumerate(self.outgoing_adj_list[start]) if x.end == v][0]
             self.outgoing_adj_list[start].pop(idx)
 
-        print(end_vertices, start_vertices)
+    def delete_vertices(self, vertices_to_delete: List[int]):
+        for v in vertices_to_delete:
+            self.delete_vertex(v)
 
     def out_vertices_by_priority(self, v: int, priority: Dict[int, int] = None):
         new_edges = sorted(filter(lambda x: priority.get(x.end), self.outgoing_adj_list[v].copy()), key=lambda x: priority[x.end], reverse=True)
@@ -94,7 +100,7 @@ class BaseGraph:
                 yield i.end
 
     def __repr__(self):
-        return f"<Graph Outgoing: {self.outgoing_adj_list}; Incoming: {self.incoming_adj_list}"
+        return f"<{self.__class__.__name__} Outgoing: {self.outgoing_adj_list}; Incoming: {self.incoming_adj_list}"
 
     @property
     def num_vertices(self):
@@ -102,6 +108,12 @@ class BaseGraph:
 
     def __getitem__(self, key):
         return set(self.outgoing_adj_list[key]).update(self.incoming_adj_list[key])
+
+    def __deepcopy__(self, memodict={}):
+        graph_copy = self.__class__()
+        for s in self.__slots__:
+            setattr(graph_copy, s, copy.deepcopy(getattr(self, s)))
+        return graph_copy
 
 
 class DirectedGraph(BaseGraph):
