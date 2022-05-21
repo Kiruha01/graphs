@@ -1,8 +1,7 @@
 import copy
 import math
 import random
-import typing
-from typing import List, Tuple, Dict, Union, Callable, Any
+from typing import List, Tuple, Optional, Dict, Union, Callable, Any, Set
 from collections import deque, defaultdict, OrderedDict
 
 from models import BaseGraph, UndirectedGraph, UndirectedWeightedGraph
@@ -36,7 +35,7 @@ def weak_conns(graph: BaseGraph) -> List[List[int]]:
     return comps
 
 
-def strong_conns(graph: BaseGraph) -> List[List[int]]:
+def strong_conns(graph: BaseGraph) -> List[Set[int]]:
     """Поиск компонент сильной связности"""
 
     unvisited = copy.deepcopy(graph.get_all_vertices())
@@ -63,7 +62,7 @@ def strong_conns(graph: BaseGraph) -> List[List[int]]:
     while ver_priority:
         start = ver_priority.popitem(last=False)[0]
         stack = deque([[start, graph.out_vertices_by_priority(start, ver_priority)]])
-        comps.append([])
+        comps.append(set())
         while stack:
             v, next_vertex_gen = stack[-1]
             if ver_priority.get(v):
@@ -74,11 +73,11 @@ def strong_conns(graph: BaseGraph) -> List[List[int]]:
                 break
             else:
                 stack.pop()
-                comps[-1].append(v)
+                comps[-1].add(v)
     return comps
 
 
-def _get_shortest_path_lengths(graph: BaseGraph, source: int, vertices: List[int]) -> Dict[int, int]:
+def _get_shortest_path_lengths(graph: BaseGraph, source: int, vertices: Optional[List[int]]) -> Dict[int, int]:
     """Кротчайшее расстояние от v до вершин vertices поиском в ширину"""
 
     unvisited_target_vertices = set(vertices)

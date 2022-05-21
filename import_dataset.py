@@ -28,7 +28,7 @@ def ca_undirected(filename: str) -> UndirectedGraph:
     return graph
 
 
-def vk_directed(filename: str):
+def vk_undirected(filename: str):
     graph = UndirectedWeightedGraph()
 
     with open(filename, newline='') as csvfile:
@@ -36,8 +36,7 @@ def vk_directed(filename: str):
         next(reader)
         for row in reader:
             u, v, t, h = "".join(row).split(",")
-            if t != '0':
-                graph.add_edge(int(u), int(v), int(t))
+            graph.add_edge(int(u), int(v), int(t))
 
     return graph
 

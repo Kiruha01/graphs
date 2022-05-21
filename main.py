@@ -1,4 +1,4 @@
-from import_dataset import google_directed, ca_undirected, vk_directed
+from import_dataset import google_directed, ca_undirected, vk_undirected
 from utils import weak_conns, strong_conns, evaluate_main_characteristics
 
 # =========== Google =============
@@ -51,7 +51,7 @@ print("90 процентиль расстояния: ", percentile)
 
 print('\nVK!!\n\n')
 
-vk_graph = vk_directed('vk.csv')
+vk_graph = vk_undirected('vk.csv')
 
 total_v = vk_graph.num_vertices
 total_e = vk_graph.num_edges
