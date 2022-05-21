@@ -101,7 +101,7 @@ def evaluate_main_characteristics(graph: BaseGraph, max_weak_comp: List[int], k:
     на k случайных вершинах
     """
 
-    random_vertices = random.choices(max_weak_comp, k=k) if len(max_weak_comp) > k else max_weak_comp
+    random_vertices = random.sample(max_weak_comp, k=k) if len(max_weak_comp) > k else max_weak_comp
 
     eccentricity = {}
     for v in random_vertices:
@@ -242,18 +242,6 @@ def run_on_graphs(
     return result
 
 
-def _get_vertices_to_delete(graph: BaseGraph, percent: float, del_only_max_degree: bool) -> List[int]:
-    if del_only_max_degree:
-        all_vertices = list(graph.get_all_vertices())
-        max_degree = max(len(graph.neighbors[v]) for v in all_vertices)
-        vertices = list(filter(lambda v: len(graph.neighbors[v]) == max_degree, all_vertices))
-    else:
-        vertices = list(graph.get_all_vertices())
-
-    vertices_num_to_delete = int(len(vertices) * percent / 100)
-    return random.choices(vertices, k=vertices_num_to_delete) if len(vertices) > vertices_num_to_delete else vertices
-
-
 def get_proportions_after_vertices_removal(
         graph: BaseGraph, step: float = 1.0, del_only_max_degree: bool = False
 ) -> List[Tuple[float, float]]:
@@ -273,7 +261,7 @@ def get_proportions_after_vertices_removal(
             sorted_all_vertices = sorted(all_vertices, key=lambda v: len(graph_copy.neighbors[v]), reverse=True)
             vertices_to_delete = sorted_all_vertices[:vertices_num_to_delete]
         else:
-            vertices_to_delete = random.choices(all_vertices, k=vertices_num_to_delete)
+            vertices_to_delete = random.sample(all_vertices, k=vertices_num_to_delete)
         graph_copy.delete_vertices(vertices_to_delete)
 
         # add proportion
