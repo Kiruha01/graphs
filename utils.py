@@ -1,5 +1,5 @@
 import copy
-import math
+from scipy.special import comb
 import random
 from typing import List, Tuple, Optional, Dict, Union, Callable, Any, Set
 from collections import deque, defaultdict, OrderedDict
@@ -87,7 +87,7 @@ def _get_shortest_path_lengths(graph: BaseGraph, source: int, vertices: Optional
     while unvisited_target_vertices:
         v, length = queue.popleft()
         for n in graph.neighbors[v]:
-            if n not in lengths:
+            if n in unvisited_target_vertices:
                 queue.append((n, length + 1))
                 lengths[n] = length + 1
                 unvisited_target_vertices.discard(n)
@@ -181,11 +181,11 @@ def average_and_global_cluster_coefficients(graph: BaseGraph) -> Tuple[float, fl
     for v in vertices:
         local_coef = _local_cluster_coefficient(graph, v)
         n = len(graph.neighbors[v])
-        comb = math.comb(n, 2)
+        combi = comb(n, 2, exact=True)
 
         sum_for_avg += local_coef
-        sum_for_global += comb*local_coef
-        sum_of_comb += comb
+        sum_for_global += combi*local_coef
+        sum_of_comb += combi
 
     average = sum_for_avg/len(vertices)
     glob = sum_for_global/sum_of_comb
