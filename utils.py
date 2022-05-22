@@ -87,7 +87,7 @@ def _get_shortest_path_lengths(graph: BaseGraph, source: int, vertices: Optional
     while unvisited_target_vertices:
         v, length = queue.popleft()
         for n in graph.neighbors[v]:
-            if n in unvisited_target_vertices:
+            if n not in lengths:
                 queue.append((n, length + 1))
                 lengths[n] = length + 1
                 unvisited_target_vertices.discard(n)
