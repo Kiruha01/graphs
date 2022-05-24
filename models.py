@@ -21,8 +21,12 @@ class Edge:
             return hash(f"{self.end} {self.start}")
 
     def __eq__(self, other):
-        return self.start == other.start and self.end == other.end \
-            or self.end == other.start and self.start == other.end
+        return (
+            self.start == other.start
+            and self.end == other.end
+            or self.end == other.start
+            and self.start == other.end
+        )
 
 
 @dataclass
@@ -40,12 +44,16 @@ class WeightedEdge(Edge):
             return hash(f"{self.end} {self.start}")
 
     def __eq__(self, other):
-        return self.start == other.start and self.end == other.end \
-            or self.end == other.start and self.start == other.end
+        return (
+            self.start == other.start
+            and self.end == other.end
+            or self.end == other.start
+            and self.start == other.end
+        )
 
 
 class BaseGraph:
-    __slots__ = ('num_edges', 'outgoing_adj_list', 'incoming_adj_list', 'neighbors')
+    __slots__ = ("num_edges", "outgoing_adj_list", "incoming_adj_list", "neighbors")
 
     def __init__(self):
         self.num_edges = 0
@@ -59,10 +67,14 @@ class BaseGraph:
 
     def get_all_edges(self) -> List[Union[Edge, WeightedEdge]]:
         """Get all edges of this graph"""
-        return [e for i in self.outgoing_adj_list.keys() for e in self.outgoing_adj_list[i]]
+        return [
+            e for i in self.outgoing_adj_list.keys() for e in self.outgoing_adj_list[i]
+        ]
 
     def get_all_vertices(self) -> Set[int]:
-        return set(self.outgoing_adj_list.keys()).union(set(self.incoming_adj_list.keys()))
+        return set(self.outgoing_adj_list.keys()).union(
+            set(self.incoming_adj_list.keys())
+        )
 
     def is_weighted(self):
         raise NotImplementedError()
@@ -81,7 +93,9 @@ class BaseGraph:
             self.outgoing_adj_list[v].pop(0)
 
         for end in end_vertices:
-            idx = [idx for idx, x in enumerate(self.incoming_adj_list[end]) if x.start == v][0]
+            idx = [
+                idx for idx, x in enumerate(self.incoming_adj_list[end]) if x.start == v
+            ][0]
             self.incoming_adj_list[end].pop(idx)
 
         start_vertices = []
@@ -90,7 +104,9 @@ class BaseGraph:
             self.incoming_adj_list[v].pop(0)
 
         for start in start_vertices:
-            idx = [idx for idx, x in enumerate(self.outgoing_adj_list[start]) if x.end == v][0]
+            idx = [
+                idx for idx, x in enumerate(self.outgoing_adj_list[start]) if x.end == v
+            ][0]
             self.outgoing_adj_list[start].pop(idx)
 
     def delete_vertices(self, vertices_to_delete: List[int]):
@@ -98,7 +114,11 @@ class BaseGraph:
             self.delete_vertex(v)
 
     def out_vertices_by_priority(self, v: int, priority: Dict[int, int] = None):
-        new_edges = sorted(filter(lambda x: priority.get(x.end), self.outgoing_adj_list[v].copy()), key=lambda x: priority[x.end], reverse=True)
+        new_edges = sorted(
+            filter(lambda x: priority.get(x.end), self.outgoing_adj_list[v].copy()),
+            key=lambda x: priority[x.end],
+            reverse=True,
+        )
         for i in new_edges:
             if priority.get(i.end):
                 yield i.end
@@ -173,8 +193,12 @@ class WeightedDirectedGraph(BaseGraph):
 
 class UndirectedWeightedGraph(BaseGraph):
     def add_edge(self, _from: int, _to: int, _weight: int) -> None:
-        self.outgoing_adj_list.setdefault(_from, list()).append(WeightedEdge(_from, _to, _weight))
-        self.outgoing_adj_list.setdefault(_to, list()).append(WeightedEdge(_to, _from, _weight))
+        self.outgoing_adj_list.setdefault(_from, list()).append(
+            WeightedEdge(_from, _to, _weight)
+        )
+        self.outgoing_adj_list.setdefault(_to, list()).append(
+            WeightedEdge(_to, _from, _weight)
+        )
         self.num_edges += 2
 
         self.neighbors[_from].add(_to)
