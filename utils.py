@@ -77,7 +77,11 @@ def strong_conns(graph: BaseGraph) -> List[Set[int]]:
     return comps
 
 
-def _get_shortest_path_lengths(graph: BaseGraph, source: int, vertices: Optional[List[int]]) -> Dict[int, int]:
+def get_shortest_path_lengths(
+        graph: BaseGraph,
+        source: int,
+        vertices: Optional[Union[List[int], Set[int]]]
+) -> Dict[int, int]:
     """Кротчайшее расстояние от v до вершин vertices поиском в ширину"""
 
     unvisited_target_vertices = set(vertices)
@@ -105,7 +109,7 @@ def evaluate_main_characteristics(graph: BaseGraph, max_weak_comp: List[int], k:
 
     eccentricity = {}
     for v in random_vertices:
-        path_lengths = _get_shortest_path_lengths(graph, v, random_vertices)
+        path_lengths = get_shortest_path_lengths(graph, v, random_vertices)
         eccentricity[v] = max(path_lengths.values())
 
     radius = min(eccentricity.values())
@@ -193,10 +197,10 @@ def average_and_global_cluster_coefficients(graph: BaseGraph) -> Tuple[float, fl
 
 
 def split_graph(
-    graph: Union[UndirectedGraph, UndirectedWeightedGraph],
-    weak_conns: List[List[int]],
-) -> List[Union[UndirectedGraph, UndirectedWeightedGraph]]:
-    """
+    graph: BaseGraph,
+    weak_conns: List[Set[int]],
+) -> List[BaseGraph]:
+    """Union[UndirectedGraph, UndirectedWeightedGraph]
     Разделить граф по компонентам слабой связности
 
     :param graph:
@@ -205,9 +209,12 @@ def split_graph(
     graphs = []
 
     for component in weak_conns:
-        new_graph = UndirectedGraph() if isinstance(graph, UndirectedGraph) else UndirectedWeightedGraph()
+        graphs.__class__
+        new_graph = graph.__class__()
         for vertex in component:
             new_graph.outgoing_adj_list[vertex] = graph.outgoing_adj_list[vertex]
+            new_graph.incoming_adj_list[vertex] = graph.incoming_adj_list[vertex]
+            new_graph.neighbors[vertex] = graph.neighbors[vertex]
         graphs.append(new_graph)
 
     return graphs
