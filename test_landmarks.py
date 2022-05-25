@@ -7,7 +7,7 @@ import io
 
 from import_dataset import ca_undirected
 from utils import split_graph, weak_conns
-from landmarks import SelectLandmarksMethod, LandmarksBasic, LandmarksLCA
+from landmarks import SelectLandmarksMethod, LandmarksBasic, LandmarksLCA, select_landmarks
 from models import UndirectedGraph
 
 
@@ -16,6 +16,12 @@ def google():
     g = ca_undirected("test_datasets/web-Google.txt")
     wc = weak_conns(g)
     return split_graph(g, wc)[0]
+
+
+@pytest.fixture
+def ca():
+    g = ca_undirected("test_datasets/CA-AstroPh.txt")
+    return g
 
 
 @pytest.fixture
@@ -44,7 +50,7 @@ def simple_graph(SPT):
     [
         SelectLandmarksMethod.RANDOM,
         SelectLandmarksMethod.MAX_DEGREE,
-        pytest.param(SelectLandmarksMethod.BEST_COVERAGE, marks=pytest.mark.xfail),
+        SelectLandmarksMethod.BEST_COVERAGE,
     ],
 )
 def test__google_landmarks(google, num_of_landmarks, method):
@@ -84,3 +90,11 @@ def test__google_landmarks_lca(google, num_of_landmarks, method):
         assert land.distance(10, 5) == 4
     else:
         assert land.distance(10, 5) == 3
+
+
+def test__best_coverage(ca):
+    seed(0)
+    # 6 paths
+    # 7 -> 4, 1 -> 3, 5 -> 4, 4 -> 3, 4 -> 3, 5 -> 2
+    l = select_landmarks(ca, 2, SelectLandmarksMethod.BEST_COVERAGE)
+    assert l == [2, 4]

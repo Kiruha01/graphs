@@ -18,7 +18,9 @@ def main():
     google_graph = ca_undirected("test_datasets/web-Google.txt")
     comps = weak_conns(google_graph)
 
-    google_land = LandmarksBasic(google_graph, 5, SelectLandmarksMethod.MANUAL)
+    gg = split_graph(google_graph, comps)
+
+    google_land = LandmarksBasic(gg[0], 5, SelectLandmarksMethod.BEST_COVERAGE)
 
     print(google_land._landmarks)
 
