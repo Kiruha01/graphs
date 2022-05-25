@@ -56,7 +56,9 @@ def select_landmarks(
 
     elif method == SelectLandmarksMethod.BEST_COVERAGE:
         all_vert = graph.get_all_vertices()
-        count_shortest_path = round(random.random() * (len(all_vert) - count_landmarks) + count_landmarks)
+        count_shortest_path = round(
+            random.random() * (len(all_vert) - count_landmarks) + count_landmarks
+        )
         all_paths = set()
         print(count_shortest_path)
 
@@ -113,7 +115,8 @@ class LandmarksBasic:
 
     def _prepare(self, graph: BaseGraph) -> None:
         for landmark in self._landmarks:
-            self._distances[landmark] = get_shortest_path_lengths(graph, landmark, graph.get_all_vertices()
+            self._distances[landmark] = get_shortest_path_lengths(
+                graph, landmark, graph.get_all_vertices()
             )
 
     def distance(self, start: int, end: int) -> int:
@@ -136,16 +139,18 @@ class LandmarksLCA(LandmarksBasic):
         upper_bounder = float("inf")
         for landmark in self._landmarks:
             lca_path = self._calculate_distance_over_by_landmark(landmark, start, end)
-            upper_bounder = min(
-                upper_bounder, len(lca_path) - 1
-            )
+            upper_bounder = min(upper_bounder, len(lca_path) - 1)
 
         return upper_bounder
 
-    def _calculate_distance_over_by_landmark(self, landmark: int, start: int, end: int) -> List[int]:
+    def _calculate_distance_over_by_landmark(
+        self, landmark: int, start: int, end: int
+    ) -> List[int]:
         SPT = self._distances[landmark]
         path_from_start_to_landmark = self.get_path_to_set(SPT, start, {landmark})
-        path_from_end_to_path_start_landmark = self.get_path_to_set(SPT, end, set(path_from_start_to_landmark))
+        path_from_end_to_path_start_landmark = self.get_path_to_set(
+            SPT, end, set(path_from_start_to_landmark)
+        )
 
         LCA = path_from_end_to_path_start_landmark[-1]
 
@@ -158,7 +163,9 @@ class LandmarksLCA(LandmarksBasic):
         return path
 
     @staticmethod
-    def get_path_to_set(SPT_tree: Dict[int, int], _from: int, _target: Set[int]) -> List[int]:
+    def get_path_to_set(
+        SPT_tree: Dict[int, int], _from: int, _target: Set[int]
+    ) -> List[int]:
         next_node = _from
         path = [next_node]
         while next_node not in _target:

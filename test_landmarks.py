@@ -7,7 +7,12 @@ import io
 
 from import_dataset import ca_undirected
 from utils import split_graph, weak_conns
-from landmarks import SelectLandmarksMethod, LandmarksBasic, LandmarksLCA, select_landmarks
+from landmarks import (
+    SelectLandmarksMethod,
+    LandmarksBasic,
+    LandmarksLCA,
+    select_landmarks,
+)
 from models import UndirectedGraph
 
 
@@ -26,13 +31,7 @@ def ca():
 
 @pytest.fixture
 def SPT():
-    d = {
-        2: 1,
-        6: 1,
-        3: 1,
-        4: 3,
-        5: 3
-    }
+    d = {2: 1, 6: 1, 3: 1, 4: 3, 5: 3}
     return d
 
 
