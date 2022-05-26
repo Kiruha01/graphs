@@ -77,7 +77,9 @@ def strong_conns(graph: BaseGraph) -> List[Set[int]]:
     return comps
 
 
-def _get_shortest_path_lengths(graph: BaseGraph, source: int, vertices: Optional[List[int]]) -> Dict[int, int]:
+def get_shortest_path_lengths(
+    graph: BaseGraph, source: int, vertices: Optional[Union[List[int], Set[int]]]
+) -> Dict[int, int]:
     """Кротчайшее расстояние от v до вершин vertices поиском в ширину"""
 
     unvisited_target_vertices = set(vertices)
@@ -95,17 +97,21 @@ def _get_shortest_path_lengths(graph: BaseGraph, source: int, vertices: Optional
     return {v: lengths[v] for v in vertices}
 
 
-def evaluate_main_characteristics(graph: BaseGraph, max_weak_comp: List[int], k: int = 500) -> Tuple[int, int, int]:
+def evaluate_main_characteristics(
+    graph: BaseGraph, max_weak_comp: List[int], k: int = 500
+) -> Tuple[int, int, int]:
     """
     Оценка значения радиуса, диаметра сети, 90 процентиля расстояния (геодезического) между вершинами графа
     на k случайных вершинах
     """
 
-    random_vertices = random.sample(max_weak_comp, k=k) if len(max_weak_comp) > k else max_weak_comp
+    random_vertices = (
+        random.sample(max_weak_comp, k=k) if len(max_weak_comp) > k else max_weak_comp
+    )
 
     eccentricity = {}
     for v in random_vertices:
-        path_lengths = _get_shortest_path_lengths(graph, v, random_vertices)
+        path_lengths = get_shortest_path_lengths(graph, v, random_vertices)
         eccentricity[v] = max(path_lengths.values())
 
     radius = min(eccentricity.values())
@@ -137,7 +143,11 @@ def num_of_triangles(graph: BaseGraph) -> int:
         for b in graph.neighbors[a]:
             if b not in marked_a:
                 for c in graph.neighbors[b]:
-                    if c not in marked_b and c not in marked_a and a in graph.neighbors[c]:
+                    if (
+                        c not in marked_b
+                        and c not in marked_a
+                        and a in graph.neighbors[c]
+                    ):
                         triangles += 1
             marked_b.add(b)
         marked_a.add(a)
@@ -184,19 +194,19 @@ def average_and_global_cluster_coefficients(graph: BaseGraph) -> Tuple[float, fl
         combi = comb(n, 2, exact=True)
 
         sum_for_avg += local_coef
-        sum_for_global += combi*local_coef
+        sum_for_global += combi * local_coef
         sum_of_comb += combi
 
-    average = sum_for_avg/len(vertices)
-    glob = sum_for_global/sum_of_comb
+    average = sum_for_avg / len(vertices)
+    glob = sum_for_global / sum_of_comb
     return average, glob
 
 
 def split_graph(
-    graph: Union[UndirectedGraph, UndirectedWeightedGraph],
-    weak_conns: List[List[int]],
-) -> List[Union[UndirectedGraph, UndirectedWeightedGraph]]:
-    """
+    graph: BaseGraph,
+    weak_conns: List[Set[int]],
+) -> List[BaseGraph]:
+    """Union[UndirectedGraph, UndirectedWeightedGraph]
     Разделить граф по компонентам слабой связности
 
     :param graph:
@@ -205,20 +215,23 @@ def split_graph(
     graphs = []
 
     for component in weak_conns:
-        new_graph = UndirectedGraph() if isinstance(graph, UndirectedGraph) else UndirectedWeightedGraph()
+        graphs.__class__
+        new_graph = graph.__class__()
         for vertex in component:
             new_graph.outgoing_adj_list[vertex] = graph.outgoing_adj_list[vertex]
+            new_graph.incoming_adj_list[vertex] = graph.incoming_adj_list[vertex]
+            new_graph.neighbors[vertex] = graph.neighbors[vertex]
         graphs.append(new_graph)
 
     return graphs
 
 
 def run_on_graphs(
-        func: Callable[[BaseGraph, Any], Any],
-        graphs: List[Union[UndirectedGraph, UndirectedWeightedGraph]],
-        adder: Callable[[Any, Any], Any],
-        *args,
-        **kwargs,
+    func: Callable[[BaseGraph, Any], Any],
+    graphs: List[Union[UndirectedGraph, UndirectedWeightedGraph]],
+    adder: Callable[[Any, Any], Any],
+    *args,
+    **kwargs,
 ) -> Any:
     """
     Запуск функции на множестве графов с последующим суммированием результата
@@ -232,7 +245,9 @@ def run_on_graphs(
     """
     result = None
     for index, graph in enumerate(graphs):
-        print(f">graph {index+1} of {len(graphs)}, size {graph.num_vertices}...", end=' ')
+        print(
+            f">graph {index+1} of {len(graphs)}, size {graph.num_vertices}...", end=" "
+        )
         val = func(graph, *args, **kwargs)
         if result is not None:
             result = adder(result, val)
@@ -243,7 +258,7 @@ def run_on_graphs(
 
 
 def get_proportions_after_vertices_removal(
-        graph: BaseGraph, step: float = 1.0, del_only_max_degree: bool = False
+    graph: BaseGraph, step: float = 1.0, del_only_max_degree: bool = False
 ) -> Tuple[List[float], List[float]]:
     assert 0 < step < 100
 
@@ -256,10 +271,14 @@ def get_proportions_after_vertices_removal(
         all_vertices = list(graph_copy.get_all_vertices())
 
         # delete needed number of vertices
-        percent_to_delete = 0.0 if x == 0.0 else 1 - (1 - x / 100) / (1 - (x - step) / 100)
+        percent_to_delete = (
+            0.0 if x == 0.0 else 1 - (1 - x / 100) / (1 - (x - step) / 100)
+        )
         vertices_num_to_delete = int(len(all_vertices) * percent_to_delete)
         if del_only_max_degree:
-            sorted_all_vertices = sorted(all_vertices, key=lambda v: len(graph_copy.neighbors[v]), reverse=True)
+            sorted_all_vertices = sorted(
+                all_vertices, key=lambda v: len(graph_copy.neighbors[v]), reverse=True
+            )
             vertices_to_delete = sorted_all_vertices[:vertices_num_to_delete]
         else:
             vertices_to_delete = random.sample(all_vertices, k=vertices_num_to_delete)
