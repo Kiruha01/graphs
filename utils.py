@@ -334,10 +334,10 @@ def get_proportions_after_vertices_removal(
         graph_copy.delete_vertices(vertices_to_delete)
 
         # add proportion
-        comps = weak_conns(graph_copy)
-        max_weak_comp = max(comps, key=len)
+
+        max_weak_comp = max_weak_conns_num(graph)
         result_x.append(x)
-        result_y.append(len(max_weak_comp) / graph_copy.num_vertices)
+        result_y.append(max_weak_comp / graph_copy.num_vertices)
 
         x += step
 
