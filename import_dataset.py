@@ -26,9 +26,9 @@ def ca_undirected(filename: str) -> UndirectedGraph:
             if l[0] == "#":
                 continue
             new_line = l.strip()
-            try:
+            if '\t' in new_line:
                 u, v = new_line.split("\t")
-            except ValueError:
+            else:
                 u, v = new_line.split(" ")
             graph.add_edge(int(u), int(v))
     return graph
