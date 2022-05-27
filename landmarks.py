@@ -56,15 +56,11 @@ def select_landmarks(
 
     elif method == SelectLandmarksMethod.BEST_COVERAGE:
         all_vert = graph.get_all_vertices()
-        count_shortest_path = round(
-            random.random() * (len(all_vert) - count_landmarks) + count_landmarks
-        )
+        count_shortest_path = len(all_vert) % 500
         all_paths = set()
-        print(count_shortest_path)
 
         for _ in range(count_shortest_path):
             start, end = random.sample(tuple(all_vert), 2)
-            print(start, end)
             tree = get_lca_tree(graph, start)
             path = {end}
             node = end
