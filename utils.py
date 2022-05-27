@@ -35,6 +35,55 @@ def weak_conns(graph: BaseGraph) -> List[Set[int]]:
     return comps
 
 
+def weak_conns_num(graph: BaseGraph) -> int:
+    """Поиск числа компонент слабой связности"""
+
+    unvisited = graph.get_all_vertices()
+    cnt = 0
+
+    while unvisited:
+        start = unvisited.pop()
+        cnt += 1
+        stack = deque([start])
+        while stack:
+            v = stack[-1]
+            unvisited.discard(v)
+            for end in graph.neighbors[v]:
+                if end in unvisited:
+                    stack.append(end)
+                    break
+            else:
+                stack.pop()
+
+    return cnt
+
+
+def max_weak_conns_num(graph: BaseGraph) -> int:
+    """Поиск числа вершин в наибольшей компоненте слабой связности"""
+
+    unvisited = graph.get_all_vertices()
+    current = 0
+    max_wc = 0
+
+    while unvisited:
+        start = unvisited.pop()
+        max_wc = max(max_wc, current)
+        current = 0
+        stack = deque([start])
+        while stack:
+            v = stack[-1]
+            unvisited.discard(v)
+            for end in graph.neighbors[v]:
+                if end in unvisited:
+                    stack.append(end)
+                    break
+            else:
+                stack.pop()
+                current += 1
+
+    return max_wc
+
+
 def strong_conns(graph: BaseGraph) -> List[Set[int]]:
     """Поиск компонент сильной связности"""
 
