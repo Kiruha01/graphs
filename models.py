@@ -57,11 +57,11 @@ class BaseGraph:
 
     def __init__(self):
         self.num_edges = 0
-        self.outgoing_adj_list = defaultdict(list)
-        self.incoming_adj_list = defaultdict(list)
+        self.outgoing_adj_list = defaultdict(set)
+        self.incoming_adj_list = defaultdict(set)
         self.neighbors = defaultdict(set)
 
-    def get_all_edges_of(self, v: int) -> List[Union[Edge, WeightedEdge]]:
+    def get_all_edges_of(self, v: int) -> Set[Union[Edge, WeightedEdge]]:
         """Get all edges connected v"""
         return self.outgoing_adj_list[v]
 
@@ -143,8 +143,8 @@ class BaseGraph:
 class DirectedGraph(BaseGraph):
     def add_edge(self, _from: int, _to: int) -> None:
         edge = Edge(_from, _to)
-        self.outgoing_adj_list[_from].append(edge)
-        self.incoming_adj_list[_to].append(edge)
+        self.outgoing_adj_list[_from].add(edge)
+        self.incoming_adj_list[_to].add(edge)
         self.num_edges += 1
 
         self.neighbors[_from].add(_to)
@@ -159,8 +159,8 @@ class DirectedGraph(BaseGraph):
 
 class UndirectedGraph(BaseGraph):
     def add_edge(self, _from: int, _to: int) -> None:
-        self.outgoing_adj_list[_from].append(Edge(_from, _to))
-        self.outgoing_adj_list[_to].append(Edge(_to, _from))
+        self.outgoing_adj_list[_from].add(Edge(_from, _to))
+        self.outgoing_adj_list[_to].add(Edge(_to, _from))
         self.num_edges += 2
 
         self.neighbors[_from].add(_to)
@@ -176,8 +176,8 @@ class UndirectedGraph(BaseGraph):
 class WeightedDirectedGraph(BaseGraph):
     def add_edge(self, _from: int, _to: int, _weight: int) -> None:
         edge = WeightedEdge(_from, _to, _weight)
-        self.outgoing_adj_list[_from].append(edge)
-        self.incoming_adj_list[_to].append(edge)
+        self.outgoing_adj_list[_from].add(edge)
+        self.incoming_adj_list[_to].add(edge)
 
         self.num_edges += 1
 
@@ -193,10 +193,10 @@ class WeightedDirectedGraph(BaseGraph):
 
 class UndirectedWeightedGraph(BaseGraph):
     def add_edge(self, _from: int, _to: int, _weight: int) -> None:
-        self.outgoing_adj_list.setdefault(_from, list()).append(
+        self.outgoing_adj_list.setdefault(_from, set()).add(
             WeightedEdge(_from, _to, _weight)
         )
-        self.outgoing_adj_list.setdefault(_to, list()).append(
+        self.outgoing_adj_list.setdefault(_to, set()).add(
             WeightedEdge(_to, _from, _weight)
         )
         self.num_edges += 2
