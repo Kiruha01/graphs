@@ -61,7 +61,7 @@ class BaseGraph:
         self.incoming_adj_list = defaultdict(list)
         self.neighbors = defaultdict(list)
 
-    def get_all_edges_of(self, v: int) -> Set[Union[Edge, WeightedEdge]]:
+    def get_all_edges_of(self, v: int) -> List[Union[Edge, WeightedEdge]]:
         """Get all edges connected v"""
         return self.outgoing_adj_list[v]
 
@@ -108,6 +108,9 @@ class BaseGraph:
                 idx for idx, x in enumerate(self.outgoing_adj_list[start]) if x.end == v
             ][0]
             self.outgoing_adj_list[start].pop(idx)
+
+        del self.outgoing_adj_list[v]
+        del self.incoming_adj_list[v]
 
     def delete_vertices(self, vertices_to_delete: List[int]):
         for v in vertices_to_delete:

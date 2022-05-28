@@ -81,6 +81,7 @@ def max_weak_conns_num(graph: BaseGraph) -> int:
                 stack.pop()
                 current += 1
 
+    max_wc = max(max_wc, current)
     return max_wc
 
 
@@ -311,7 +312,7 @@ def get_proportions_after_vertices_removal(
 ) -> Tuple[List[float], List[float]]:
     assert 0 < step < 100
 
-    graph_copy = copy.deepcopy(graph)
+    graph_copy = graph
 
     result_x = []
     result_y = []
