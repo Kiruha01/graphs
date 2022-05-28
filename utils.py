@@ -335,7 +335,7 @@ def get_proportions_after_vertices_removal(
 
         # add proportion
 
-        max_weak_comp = max_weak_conns_num(graph)
+        max_weak_comp = max_weak_conns_num(graph_copy)
         result_x.append(x)
         result_y.append(max_weak_comp / graph_copy.num_vertices)
 
